@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.core.project.picwiz.HomeScreen">
+    <item android:id="@+id/action_Settings" android:title="@string/action_settings"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_MyProfile" android:title="@string/action_myprofile"
+        android:orderInCategory="101" app:showAsAction="never" />
+    <item android:id="@+id/action_About" android:title="@string/action_about"
+        android:orderInCategory="102" app:showAsAction="never" />
+</menu>

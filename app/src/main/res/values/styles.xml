@@ -1,0 +1,26 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="MenuLabelsStyle">
+        <item name="android:background">@drawable/label_background</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="MenuButtonsStyle">
+        <item name="fab_size">mini</item>
+        <item name="fab_showAnimation">@anim/fab_scale_up</item>
+        <item name="fab_hideAnimation">@anim/fab_scale_down</item>
+        <item name="fab_shadowColor">#444</item>
+        <item name="fab_colorNormal">@color/floating_primary_pressed</item>
+        <item name="fab_colorPressed">@color/floating_primary_pressed</item>
+        <item name="fab_colorRipple">@color/floating_ripple</item>
+    </style>
+
+</resources>
