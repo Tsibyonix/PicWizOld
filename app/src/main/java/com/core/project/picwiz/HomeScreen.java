@@ -69,9 +69,19 @@ public class HomeScreen extends AppCompatActivity {
                     newDir.mkdirs();
                 }
 
+                String file;
+                File newPic;
+
                 currentPicNumber = currentPicNumber+1;
-                String file = dir+currentPicNumber+".jpg";
-                File newPic = new File(file);
+                file = dir+currentPicNumber+".jpg";
+                newPic = new File(file);
+
+                while (newPic.exists()) {
+                    currentPicNumber = currentPicNumber + 1;
+                    file = dir+currentPicNumber+".jpg";
+                    newPic = new File(file);
+                }
+
                 try {
                     newPic.createNewFile();
                 } catch (IOException e) {
@@ -119,7 +129,7 @@ public class HomeScreen extends AppCompatActivity {
         Log.i(TAG, String.valueOf(currentPicNumber));
         SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putInt("currentPicNumber`", currentPicNumber);
+        editor.putInt("currentPicNumber", currentPicNumber);
         editor.apply();
     }
 }
