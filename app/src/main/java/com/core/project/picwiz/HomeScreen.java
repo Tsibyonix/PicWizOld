@@ -1,5 +1,6 @@
 package com.core.project.picwiz;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -33,9 +34,9 @@ public class HomeScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
 
-        SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, 0);
-        SharedPreferences.Editor edit;
-        currentPicNumber = settings.getInt("currentPic", 0);
+        SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, Activity.MODE_PRIVATE);
+        currentPicNumber = settings.getInt("currentPicNumber", 0);
+        Log.i(TAG, String.valueOf(currentPicNumber));
 
         FrameLayout homeScreen = (FrameLayout) findViewById(R.id.home_Screen_Layout);
 
@@ -68,13 +69,13 @@ public class HomeScreen extends AppCompatActivity {
                     newDir.mkdirs();
                 }
 
-                currentPicNumber++;
+                currentPicNumber = currentPicNumber+1;
                 String file = dir+currentPicNumber+".jpg";
                 File newPic = new File(file);
                 try {
                     newPic.createNewFile();
                 } catch (IOException e) {
-                    Log.d(TAG, "New image file not created");
+                    Log.i(TAG, "New image file not created");
                 }
 
                 Uri outputFileUri = Uri.fromFile(newPic);
@@ -114,9 +115,11 @@ public class HomeScreen extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
+        Log.i(TAG, "onStop Called");
+        Log.i(TAG, String.valueOf(currentPicNumber));
         SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putInt("currentPic", currentPicNumber);
+        editor.putInt("currentPicNumber`", currentPicNumber);
+        editor.apply();
     }
 }
