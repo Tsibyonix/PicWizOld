@@ -27,7 +27,13 @@ public class HomeScreen extends AppCompatActivity {
     public static final String SETTINGS_NAME = "MySettingsFile";
     int currentPicNumber;
     String TAG = "log";
-    int PHOTO_CODE = 0;
+
+    //intent codes
+    private static final int PHOTO_CODE = 0;
+    private static final int GET_PHOTO = 1;
+
+    //intent Extra
+    public int UPLOAD_LATER;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +102,28 @@ public class HomeScreen extends AppCompatActivity {
                 startActivityForResult(cameraIntent, PHOTO_CODE);
             }
         });
+
+        floatingActionButton_Gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent galleryIntent = new Intent();
+                galleryIntent.setType("image/*");
+                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(galleryIntent, "SELECT PICTURE"), GET_PHOTO);
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "Loading new Activity");
+        String selectedImagePath;
+        Uri selectedImageUri = data.getData();
+        selectedImagePath = selectedImageUri.getPath();
+
+        Intent galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
+        galleryUploadPhotoIntent.putExtra("selectedImagePath", selectedImagePath);
+        startActivity(galleryUploadPhotoIntent);
     }
 
     @Override
