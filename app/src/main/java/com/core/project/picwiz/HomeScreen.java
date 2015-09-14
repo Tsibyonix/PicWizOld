@@ -3,6 +3,8 @@ package com.core.project.picwiz;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -116,14 +118,23 @@ public class HomeScreen extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i(TAG, "Loading new Activity");
+        super.onActivityResult(requestCode, resultCode, data);
         String selectedImagePath;
-        Uri selectedImageUri = data.getData();
-        selectedImagePath = selectedImageUri.getPath();
 
-        Intent galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
-        galleryUploadPhotoIntent.putExtra("selectedImagePath", selectedImagePath);
-        startActivity(galleryUploadPhotoIntent);
+        if (requestCode == GET_PHOTO && resultCode == RESULT_OK
+                && null != data) {
+            Uri selectedImageURI = data.getData();
+            if(selectedImageURI == null)
+                Log.i(TAG, "NULL");
+
+            selectedImagePath = selectedImageURI.toString();
+
+            Toast.makeText(this, selectedImagePath, Toast.LENGTH_LONG).show();
+            //Log.i(TAG, selectedImagePath);
+            Intent galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
+            galleryUploadPhotoIntent.putExtra("selectedImagePath", selectedImagePath);
+            startActivity(galleryUploadPhotoIntent);
+        }
     }
 
     @Override

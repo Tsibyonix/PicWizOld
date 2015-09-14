@@ -1,53 +1,77 @@
 package com.core.project.picwiz;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UploadPicture extends AppCompatActivity {
     String photoLocation;
+    Uri photoLocationURI;
+    String getPhotoLocationPath;
     String TAG = "log";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_picture);
+        ImageView imageView = (ImageView) findViewById(R.id.selectedImageView);
 
         if(savedInstanceState == null) {
+            Log.i(TAG, "Not a saved instance");
             Bundle extra = getIntent().getExtras();
             if(extra == null) {
+                Log.i(TAG, "Extra is null");
                 photoLocation = null;
             } else {
-                photoLocation = extra.getString("currentPicNumber");
+                Log.i(TAG, "uri set");
+                photoLocation = extra.getString("selectedImagePath");
             }
         } else {
-            photoLocation = (String) savedInstanceState.getSerializable("STRING_I_NEED");
+            photoLocation = (String) savedInstanceState.getSerializable("selectedImagePath");
         }
 
-        Log.i(TAG, photoLocation);
+        photoLocationURI = Uri.parse(photoLocation);
+
+        imageView.setImageURI(null);
+        imageView.setImageURI(photoLocationURI);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_upload_picture, menu);
-        return true;
+    public static Uri handleImageUri(Uri uri) {
+        Pattern pattern = Pattern.compile("(content://media/.*\\d)");
+        if (uri.getPath().contains("content")) {
+            Matcher matcher = pattern.matcher(uri.getPath());
+            if (matcher.find())
+                return Uri.parse(matcher.group(1));
+            else
+                throw new IllegalArgumentException("Cannot handle this URI");
+        } else
+            return uri;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }
