@@ -31,11 +31,13 @@ public class HomeScreen extends AppCompatActivity {
     String TAG = "log";
 
     //intent codes
-    private static final int PHOTO_CODE = 0;
-    private static final int GET_PHOTO = 1;
+    private static final int PHOTO_CODE = 1;
+    private static final int GET_PHOTO = 0;
 
     //intent Extra
     public int UPLOAD_LATER;
+
+    FloatingActionMenu floatingActionMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,15 +51,12 @@ public class HomeScreen extends AppCompatActivity {
         FrameLayout homeScreen = (FrameLayout) findViewById(R.id.home_Screen_Layout);
 
         //Floating Menu; API: https://github.com/Clans/FloatingActionButton
-        final FloatingActionMenu floatingActionMenu = (FloatingActionMenu) findViewById(R.id.floatingActionMenu);
+        floatingActionMenu = (FloatingActionMenu) findViewById(R.id.floatingActionMenu);
         floatingActionMenu.setClosedOnTouchOutside(true);
 
         floatingActionMenu.setOnMenuButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (floatingActionMenu.isOpened()) {
-                    Toast.makeText(HomeScreen.this, floatingActionMenu.getMenuButtonLabelText(), Toast.LENGTH_SHORT).show();
-                }
                 floatingActionMenu.toggle(true);
             }
         });
@@ -101,7 +100,7 @@ public class HomeScreen extends AppCompatActivity {
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 
-                startActivityForResult(cameraIntent, PHOTO_CODE);
+                startActivityForResult(Intent.createChooser(cameraIntent, "CLICK PICTURE"), PHOTO_CODE);
             }
         });
 
@@ -121,20 +120,24 @@ public class HomeScreen extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         String selectedImagePath;
 
-        if (requestCode == GET_PHOTO && resultCode == RESULT_OK
-                && null != data) {
-            Uri selectedImageURI = data.getData();
-            if(selectedImageURI == null)
-                Log.i(TAG, "NULL");
+        if (resultCode == RESULT_OK && null != data) {
+            if(requestCode == 0) {
+                Uri selectedImageURI = data.getData();
+                if(selectedImageURI == null)
+                    Log.i(TAG, "NULL");
 
-            selectedImagePath = selectedImageURI.toString();
+                selectedImagePath = selectedImageURI.toString();
 
-            Toast.makeText(this, selectedImagePath, Toast.LENGTH_LONG).show();
-            //Log.i(TAG, selectedImagePath);
-            Intent galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
-            galleryUploadPhotoIntent.putExtra("selectedImagePath", selectedImagePath);
-            startActivity(galleryUploadPhotoIntent);
+                //Toast.makeText(this, selectedImagePath, Toast.LENGTH_LONG).show();
+                //Log.i(TAG, selectedImagePath);
+                Intent galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
+                galleryUploadPhotoIntent.putExtra("selectedImagePath", selectedImagePath);
+                startActivity(galleryUploadPhotoIntent);
+            } else {
+                Toast.makeText(this, "camera activity", Toast.LENGTH_SHORT).show();
+            }
         }
+
     }
 
     @Override
@@ -164,6 +167,7 @@ public class HomeScreen extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        floatingActionMenu.close(false);
         Log.i(TAG, "onStop Called");
         Log.i(TAG, String.valueOf(currentPicNumber));
         SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, 0);
