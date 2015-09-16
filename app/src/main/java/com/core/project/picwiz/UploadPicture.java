@@ -143,7 +143,3 @@ public class  UploadPicture extends AppCompatActivity {
         return finalPath;
     }
 }
-
-
-
-
