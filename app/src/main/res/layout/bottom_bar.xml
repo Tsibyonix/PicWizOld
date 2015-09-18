@@ -2,7 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="160dp"
-    android:background="#2b2b2b">
+    android:background="#2b2b2b"
+    android:paddingRight="16dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,7 +16,7 @@
             android:textColor="#ffffff"
             android:checked="false"
             android:textSize="16dp"
-            android:layout_below="@+id/space3"
+            android:layout_below="@+id/space_top"
             android:layout_alignParentStart="true" />
 
         <TextView
@@ -23,15 +24,15 @@
             android:layout_height="wrap_content"
             android:text="Location"
             android:textColor="#ffffff"
-            android:layout_below="@+id/editText"
+            android:layout_below="@+id/captionField"
             android:layout_alignParentStart="true"
-            android:id="@+id/textView2"
+            android:id="@+id/location"
             android:textSize="16dp" />
 
         <EditText
             android:layout_width="fill_parent"
             android:layout_height="60dp"
-            android:id="@+id/editText"
+            android:id="@+id/captionField"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:text="Caption..."
@@ -41,10 +42,17 @@
         <Space
             android:layout_width="match_parent"
             android:layout_height="16dp"
-            android:id="@+id/space3"
-            android:layout_below="@+id/editText"
+            android:id="@+id/space_top"
+            android:layout_below="@+id/captionField"
             android:layout_alignParentStart="true"
             android:layout_marginTop="22dp" />
+
+        <Space
+            android:id="@+id/space_bottom"
+            android:layout_width="fill_parent"
+            android:layout_height="16dp"
+            android:layout_below="@+id/uploadCheck"
+            android:layout_alignParentStart="true" />
     </RelativeLayout>
 
 </android.support.v7.widget.Toolbar>

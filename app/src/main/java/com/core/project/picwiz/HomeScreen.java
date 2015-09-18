@@ -157,6 +157,7 @@ public class HomeScreen extends AppCompatActivity {
                     galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
                     galleryUploadPhotoIntent.putExtra("selectedImagePath", outputFileUri.toString());
                     startActivity(galleryUploadPhotoIntent);
+                    break;
             }
         } else {
             switch (requestCode){

@@ -25,7 +25,7 @@
             android:id="@+id/bottomBar"
             layout="@layout/bottom_bar"
             android:layout_width="fill_parent"
-            android:layout_height="160dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true" />
 

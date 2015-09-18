@@ -16,12 +16,18 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
+
+import org.w3c.dom.Text;
 
 public class  UploadPicture extends AppCompatActivity {
     String photoLocation;
@@ -35,9 +41,14 @@ public class  UploadPicture extends AppCompatActivity {
     Button crop_scale;
     FloatingActionButton upload;
     Bitmap outBitmap;
+    CheckBox uploadCheck;
+    EditText caption;
+    TextView location;
+    Space spaceTop;
+    Space space_bottom;
 
     //bar
-    android.support.design.widget.CollapsingToolbarLayout midBar;
+    android.support.v7.widget.Toolbar midBar;
     android.support.v7.widget.Toolbar bottomBar;
 
     String currentScale = "crop";
@@ -49,9 +60,17 @@ public class  UploadPicture extends AppCompatActivity {
         imageView = (TouchImageView) findViewById(R.id.customImageView);
         crop_scale = (Button) findViewById(R.id.crop_fit);
         upload = (FloatingActionButton) findViewById(R.id.upload);
+        uploadCheck = (CheckBox) findViewById(R.id.uploadCheck);
+        caption = (EditText) findViewById(R.id.captionField);
+        location = (TextView) findViewById(R.id.location);
+        spaceTop = (Space) findViewById(R.id.space_top);
+        space_bottom = (Space) findViewById(R.id.space_bottom);
         //bar
-        //midBar = (android.support.design.widget.CollapsingToolbarLayout) findViewById(R.id.midBar);
+        midBar = (android.support.v7.widget.Toolbar) findViewById(R.id.midBar);
         bottomBar = (android.support.v7.widget.Toolbar) findViewById(R.id.bottomBar);
+
+        //upload.setVisibility(View.GONE);
+        //upload.setAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
 
         if(savedInstanceState == null) {
             Log.i(TAG, "Not a saved instance");
@@ -80,7 +99,7 @@ public class  UploadPicture extends AppCompatActivity {
                 imageView.setImageURI(photoLocationURI);
             }
         });
-/*
+
         crop_scale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,15 +112,22 @@ public class  UploadPicture extends AppCompatActivity {
                 }
             }
         });
-*/
 
-        bottomBar.setOnTouchListener(new View.OnTouchListener() {
+
+        midBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction())
                 {
                     case MotionEvent.ACTION_MOVE:
-                        Toast.makeText(UploadPicture.this, "drag", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(UploadPicture.this, "drag", Toast.LENGTH_SHORT).show();
+
+                        if(!uploadCheck.isChecked()) {
+                            uploadCheck.setChecked(false);
+                        }
+                        else {
+                            uploadCheck.setChecked(true);
+                        }
                         break;
                 }
                 return true;
@@ -114,6 +140,23 @@ public class  UploadPicture extends AppCompatActivity {
                 outBitmap = imageView.getDrawingCache();
 
                 //image save logic
+            }
+        });
+
+        uploadCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!uploadCheck.isChecked()) {
+                    caption.setVisibility(View.VISIBLE);
+                    location.setVisibility(View.VISIBLE);
+                    spaceTop.setVisibility(View.VISIBLE);
+                    space_bottom.setVisibility(View.VISIBLE);
+                } else {
+                    caption.setVisibility(View.GONE);
+                    location.setVisibility(View.GONE);
+                    spaceTop.setVisibility(View.GONE);
+                    space_bottom.setVisibility(View.GONE);
+                }
             }
         });
     }
