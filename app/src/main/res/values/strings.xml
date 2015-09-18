@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">PicWiz</string>
     <string name="app_version">0.1 beta</string>
-    <string name="title_activity_home_screen">HomeScreen</string>
+    <string name="title_activity_home_screen">PicWiz</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
