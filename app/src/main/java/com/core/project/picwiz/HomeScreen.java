@@ -1,3 +1,13 @@
+/*
+    HomeScreen runs after the splash screen.
+    Contains the recycler view to show images on the go
+    The floating add buttons gives you the option to choose the input method the upload a new pic
+    1. The gallery option takes you to the gallery and shows your selection on the upload_activity
+    2. The camera option helps you the click pics and upload them directly
+
+    The top rite corner has a overflow menu which takes you to different activities like settings and profile
+*/
+
 package com.core.project.picwiz;
 
 import android.app.Activity;
@@ -28,7 +38,11 @@ import java.io.IOException;
 public class HomeScreen extends AppCompatActivity {
     public static final String SETTINGS_NAME = "MySettingsFile";
     int currentPicNumber;
+    String username;
+    String email;
     String TAG = "log";
+    String currentTheme = "AppLiteTheme";
+    Settings setting;
 
     //intent codes
     private static final int PHOTO_CODE = 1;
@@ -36,6 +50,8 @@ public class HomeScreen extends AppCompatActivity {
 
     //intent Extra
     public int UPLOAD_LATER;
+    Uri outputFileUri;
+    Intent galleryUploadPhotoIntent;
 
     FloatingActionMenu floatingActionMenu;
 
@@ -45,6 +61,8 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
 
         SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, Activity.MODE_PRIVATE);
+        username = settings.getString("username", null);
+        email = settings.getString("email", null);
         currentPicNumber = settings.getInt("currentPicNumber", 0);
         Log.i(TAG, String.valueOf(currentPicNumber));
 
@@ -89,13 +107,13 @@ public class HomeScreen extends AppCompatActivity {
                     newPic = new File(file);
                 }
 
-                try {
-                    newPic.createNewFile();
-                } catch (IOException e) {
-                    Log.i(TAG, "New image file not created");
-                }
+//                try {
+//                    newPic.createNewFile();
+//                } catch (IOException e) {
+//                    Log.i(TAG, "New image file not created");
+//                }
 
-                Uri outputFileUri = Uri.fromFile(newPic);
+                outputFileUri = Uri.fromFile(newPic);
 
                 Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
@@ -121,23 +139,39 @@ public class HomeScreen extends AppCompatActivity {
         String selectedImagePath;
 
         if (resultCode == RESULT_OK && null != data) {
-            if(requestCode == 0) {
-                Uri selectedImageURI = data.getData();
-                if(selectedImageURI == null)
-                    Log.i(TAG, "NULL");
+            switch(requestCode)
+            {
+                case GET_PHOTO:
+                    Uri selectedImageURI = data.getData();
+                    if(selectedImageURI == null)
+                        Log.i(TAG, "NULL");
 
-                selectedImagePath = selectedImageURI.toString();
+                    selectedImagePath = selectedImageURI.toString();
+                    galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
+                    galleryUploadPhotoIntent.putExtra("selectedImagePath", selectedImagePath);
+                    startActivity(galleryUploadPhotoIntent);
+                    break;
 
-                //Toast.makeText(this, selectedImagePath, Toast.LENGTH_LONG).show();
-                //Log.i(TAG, selectedImagePath);
-                Intent galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
-                galleryUploadPhotoIntent.putExtra("selectedImagePath", selectedImagePath);
-                startActivity(galleryUploadPhotoIntent);
-            } else {
-                Toast.makeText(this, "camera activity", Toast.LENGTH_SHORT).show();
+                case PHOTO_CODE:
+                    Toast.makeText(HomeScreen.this, "camera activity", Toast.LENGTH_SHORT).show();
+                    galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
+                    galleryUploadPhotoIntent.putExtra("selectedImagePath", outputFileUri.toString());
+                    startActivity(galleryUploadPhotoIntent);
+            }
+        } else {
+            switch (requestCode){
+                case PHOTO_CODE:
+                    if(resultCode == RESULT_CANCELED) {
+                        Log.i(TAG, "Intent Canceled");
+                    }else {
+                        Toast.makeText(HomeScreen.this, "camera activity", Toast.LENGTH_SHORT).show();
+                        galleryUploadPhotoIntent = new Intent(this, UploadPicture.class);
+                        galleryUploadPhotoIntent.putExtra("selectedImagePath", outputFileUri.toString());
+                        startActivity(galleryUploadPhotoIntent);
+                    }
+                    break;
             }
         }
-
     }
 
     @Override

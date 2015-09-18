@@ -1,3 +1,7 @@
+/*
+    About screen shows the app logo and version
+*/
+
 package com.core.project.picwiz;
 
 import android.support.v7.app.AppCompatActivity;

@@ -5,6 +5,14 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="AppLiteTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="Splash" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
     <style name="MenuLabelsStyle">
         <item name="android:background">@drawable/label_background</item>
         <item name="android:textColor">#FFFFFF</item>

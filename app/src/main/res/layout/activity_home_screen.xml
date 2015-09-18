@@ -10,7 +10,9 @@
     tools:context="com.core.project.picwiz.HomeScreen"
     android:id="@+id/home_Screen_Layout">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+    <TextView
+        android:text="@string/hello_world"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <com.github.clans.fab.FloatingActionMenu
@@ -22,7 +24,6 @@
         android:layout_marginRight="8dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        fab:menu_fab_label="Floating Button"
         fab:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
         fab:menu_labels_hideAnimation="@anim/fab_slide_out_to_right"
         fab:fab_colorNormal="@color/floating_primary_pressed"
