@@ -116,7 +116,6 @@ public class  UploadPicture extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bitmap bitmap=null;
 
                 new UploadTask().execute();
 
