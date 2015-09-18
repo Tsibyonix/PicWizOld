@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+
 public class  UploadPicture extends AppCompatActivity {
     String photoLocation;
     Uri photoLocationURI;
@@ -29,14 +32,13 @@ public class  UploadPicture extends AppCompatActivity {
     float imageViewX, imageViewY;
 
     TouchImageView imageView;
-    TextView touch;
-    TextView left;
-    TextView top;
-    TextView bottom;
-    TextView right;
-    TextView imageviewsize;
-    TextView imageres;
     Button crop_scale;
+    FloatingActionButton upload;
+    Bitmap outBitmap;
+
+    //bar
+    android.support.design.widget.CollapsingToolbarLayout midBar;
+    android.support.v7.widget.Toolbar bottomBar;
 
     String currentScale = "crop";
 
@@ -45,19 +47,11 @@ public class  UploadPicture extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_picture);
         imageView = (TouchImageView) findViewById(R.id.customImageView);
-        imageres = (TextView) findViewById(R.id.touch);
-
-        //debug
-        imageviewsize = (TextView) findViewById(R.id.imageviewsize);
-        imageres  = (TextView) findViewById(R.id.resolution);
         crop_scale = (Button) findViewById(R.id.crop_fit);
-
-        final TextView cropres = (TextView) findViewById(R.id.cropres);
-        final TextView path = (TextView) findViewById(R.id.path);
-        final TextView left = (TextView) findViewById(R.id.left);
-        final TextView top = (TextView) findViewById(R.id.top);
-        final TextView bottom = (TextView) findViewById(R.id.bottom);
-        final TextView right = (TextView) findViewById(R.id.right);
+        upload = (FloatingActionButton) findViewById(R.id.upload);
+        //bar
+        //midBar = (android.support.design.widget.CollapsingToolbarLayout) findViewById(R.id.midBar);
+        bottomBar = (android.support.v7.widget.Toolbar) findViewById(R.id.bottomBar);
 
         if(savedInstanceState == null) {
             Log.i(TAG, "Not a saved instance");
@@ -74,12 +68,9 @@ public class  UploadPicture extends AppCompatActivity {
         }
 
         photoLocationURI = Uri.parse(photoLocation);
-
         photoLocationPath = getRealPathFromURI(photoLocationURI);
 
-        path.setText(getRealPathFromURI(photoLocationURI));
-
-        ViewTreeObserver imageViewObserver = imageView.getViewTreeObserver();
+        final ViewTreeObserver imageViewObserver = imageView.getViewTreeObserver();
         imageViewObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -87,21 +78,42 @@ public class  UploadPicture extends AppCompatActivity {
                 imageViewX = (float) imageView.getMeasuredWidth();
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 imageView.setImageURI(photoLocationURI);
-
-                //scale(ScalingLogic.CROP);
             }
         });
-
+/*
         crop_scale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(currentScale.contains("crop")) {
+                if (currentScale.contains("crop")) {
                     imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     currentScale = "fit";
                 } else {
                     imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                     currentScale = "crop";
                 }
+            }
+        });
+*/
+
+        bottomBar.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction())
+                {
+                    case MotionEvent.ACTION_MOVE:
+                        Toast.makeText(UploadPicture.this, "drag", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        });
+        upload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageView.buildDrawingCache();
+                outBitmap = imageView.getDrawingCache();
+
+                //image save logic
             }
         });
     }

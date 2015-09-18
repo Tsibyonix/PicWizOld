@@ -4,9 +4,4 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.core.project.picwiz.UploadPicture">
 
-    <item
-        android:id="@+id/action_upload"
-        android:title="@string/action_upload"
-        android:orderInCategory="100"
-        app:showAsAction="always" />
 </menu>
