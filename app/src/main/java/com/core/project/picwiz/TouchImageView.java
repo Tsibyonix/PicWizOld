@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -14,6 +15,7 @@ import android.os.Build;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
+import android.os.Message;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -26,10 +28,15 @@ import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
 public class TouchImageView extends ImageView {
 	
 	private static final String DEBUG = "DEBUG";
-	
+
+    public int TASK_CODE;
+
 	//
 	// SuperMin and SuperMax multipliers. Determine how much the image can be
 	// zoomed below or above the zoom boundaries, before animating back to the
@@ -50,6 +57,7 @@ public class TouchImageView extends ImageView {
     // saved prior to the screen rotating.
     //
 	private Matrix matrix, prevMatrix;
+
 
     private static enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM };
     private State state;
@@ -1260,5 +1268,58 @@ public class TouchImageView extends ImageView {
     	float[] n = new float[9];
     	matrix.getValues(n);
     	Log.d(DEBUG, "Scale: " + n[Matrix.MSCALE_X] + " TransX: " + n[Matrix.MTRANS_X] + " TransY: " + n[Matrix.MTRANS_Y]);
+    }
+
+    public void changeBrightness(int brightnessLevel) {
+        this.buildDrawingCache();
+        Bitmap bitmap = this.getDrawingCache();
+        bitmap = brightenBitmap(bitmap, brightnessLevel);
+        this.setImageBitmap(bitmap);
+    }
+
+    public Bitmap changeBrightness(Bitmap bitmap, int brightnessLevel) {
+        bitmap = brightenBitmap(bitmap, brightnessLevel);
+        return bitmap;
+    }
+
+    Bitmap brightenBitmap(Bitmap bitmap, int value) {
+        int A, R, G, B;
+        int pixel;
+
+        for (int x = 0; x < bitmap.getWidth(); ++x) {
+            for (int y = 0; y < bitmap.getHeight(); ++y) {
+                // get pixel color
+                pixel = bitmap.getPixel(x, y);
+                A = Color.alpha(pixel);
+                R = Color.red(pixel);
+                G = Color.green(pixel);
+                B = Color.blue(pixel);
+
+                // increase/decrease each channel
+                R += value;
+                if (R > 255) {
+                    R = 255;
+                } else if (R < 0) {
+                    R = 0;
+                }
+
+                G += value;
+                if (G > 255) {
+                    G = 255;
+                } else if (G < 0) {
+                    G = 0;
+                }
+
+                B += value;
+                if (B > 255) {
+                    B = 255;
+                } else if (B < 0) {
+                    B = 0;
+                }
+
+                bitmap.setPixel(x, y, Color.argb(A, R, G, B));
+            }
+        }
+        return bitmap;
     }
 }

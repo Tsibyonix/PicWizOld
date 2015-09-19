@@ -1,13 +1,14 @@
 package com.core.project.picwiz;
 
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PointF;
-import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
+import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.support.design.widget.CoordinatorLayout;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,40 +17,61 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.core.project.picwiz.Filters.GrayFilter;
 
+import com.core.project.picwiz.Filters.OldFilter;
 import com.github.clans.fab.FloatingActionButton;
 
-import org.w3c.dom.Text;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.NetworkInterface;
+import java.net.URL;
 
 public class  UploadPicture extends AppCompatActivity {
     String photoLocation;
     Uri photoLocationURI;
     String photoLocationPath;
-    String TAG = "log";
+    private static String TAG = "log";
+    private Bitmap changeBitmap = null;
 
     float imageViewX, imageViewY;
 
     TouchImageView imageView;
-    Button crop_scale;
     FloatingActionButton upload;
     Bitmap outBitmap;
+    Bitmap originalBitmap;
+
+    int CurrentSavedPicNumber;
+
+    //location
+    public String latitude;
+    public String longitude;
+
+    //img
+    Button rotation;
+    Button crop_scale;
+    Button brightness;
+        SeekBar setBrightness;
+
+    //bar
+    android.support.v7.widget.Toolbar midBar;
+    android.support.v7.widget.Toolbar bottomBar;
     CheckBox uploadCheck;
     EditText caption;
     TextView location;
     Space spaceTop;
     Space space_bottom;
-
-    //bar
-    android.support.v7.widget.Toolbar midBar;
-    android.support.v7.widget.Toolbar bottomBar;
 
     String currentScale = "crop";
 
@@ -58,7 +80,6 @@ public class  UploadPicture extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_picture);
         imageView = (TouchImageView) findViewById(R.id.customImageView);
-        crop_scale = (Button) findViewById(R.id.crop_fit);
         upload = (FloatingActionButton) findViewById(R.id.upload);
         uploadCheck = (CheckBox) findViewById(R.id.uploadCheck);
         caption = (EditText) findViewById(R.id.captionField);
@@ -68,6 +89,12 @@ public class  UploadPicture extends AppCompatActivity {
         //bar
         midBar = (android.support.v7.widget.Toolbar) findViewById(R.id.midBar);
         bottomBar = (android.support.v7.widget.Toolbar) findViewById(R.id.bottomBar);
+
+        //img
+        crop_scale = (Button) findViewById(R.id.crop_fit);
+        rotation = (Button) findViewById(R.id.rotate);
+        brightness = (Button) findViewById(R.id.brightness);
+            setBrightness = (SeekBar) findViewById(R.id.setBrightness);
 
         //upload.setVisibility(View.GONE);
         //upload.setAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
@@ -89,6 +116,12 @@ public class  UploadPicture extends AppCompatActivity {
         photoLocationURI = Uri.parse(photoLocation);
         photoLocationPath = getRealPathFromURI(photoLocationURI);
 
+        try {
+            originalBitmap = MediaStore.Images.Media.getBitmap(UploadPicture.this.getContentResolver(),photoLocationURI);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         final ViewTreeObserver imageViewObserver = imageView.getViewTreeObserver();
         imageViewObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -96,7 +129,9 @@ public class  UploadPicture extends AppCompatActivity {
                 imageViewY = (float) imageView.getMeasuredHeight();
                 imageViewX = (float) imageView.getMeasuredWidth();
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                imageView.setImageURI(photoLocationURI);
+                //imageView.setImageURI(photoLocationURI);
+                imageView.setImageBitmap(originalBitmap);
+                getGeoLocation();
             }
         });
 
@@ -113,19 +148,16 @@ public class  UploadPicture extends AppCompatActivity {
             }
         });
 
-
         midBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction())
-                {
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_MOVE:
                         //Toast.makeText(UploadPicture.this, "drag", Toast.LENGTH_SHORT).show();
 
-                        if(!uploadCheck.isChecked()) {
+                        if (!uploadCheck.isChecked()) {
                             uploadCheck.setChecked(false);
-                        }
-                        else {
+                        } else {
                             uploadCheck.setChecked(true);
                         }
                         break;
@@ -133,13 +165,43 @@ public class  UploadPicture extends AppCompatActivity {
                 return true;
             }
         });
+
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageView.buildDrawingCache();
-                outBitmap = imageView.getDrawingCache();
+                if(uploadCheck.isChecked()) {
+                    BitmapDrawable btmpDr = (BitmapDrawable) imageView.getDrawable();
+                    outBitmap = btmpDr.getBitmap();
 
-                //image save logic
+                    final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/PicWiz/";
+                    File newDir = new File(dir);
+                    if (newDir.isDirectory()) {
+
+                    } else {
+                        newDir.mkdirs();
+                    }
+
+                    Uri outputImageUri;
+                    String file;
+                    File newPic;
+                    FileOutputStream fileOutputStream = null;
+
+                    CurrentSavedPicNumber = +200;
+                    file = dir + CurrentSavedPicNumber + ".jpg";
+                    newPic = new File(file);
+
+                    outputImageUri = Uri.fromFile(newPic);
+                    try {
+                        fileOutputStream = new FileOutputStream(newPic);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    outBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                } else {
+
+                }
+
             }
         });
 
@@ -159,6 +221,72 @@ public class  UploadPicture extends AppCompatActivity {
                 }
             }
         });
+
+        brightness.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(setBrightness.getVisibility() == View.VISIBLE) {
+                    setBrightness.setVisibility(View.GONE);
+                } else {
+                    setBrightness.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        rotation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap tempBitmap = null;
+                imageView.buildDrawingCache();
+                tempBitmap = imageView.getDrawingCache();
+                imageView.setImageBitmap(null);
+                final Bitmap finalTempBitmap = Bitmap.createBitmap(tempBitmap);
+
+                new AsyncTask<Void, Bitmap, Void>() {
+
+                    Bitmap processedBitmap;
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        Log.i("Filter", "Running");
+                        processedBitmap = OldFilter.changeToOld(finalTempBitmap);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        Log.i("Filter", "Done");
+                        imageView.setImageBitmap(processedBitmap);
+                    }
+                }.execute();
+                //imageView.setImageBitmap(tempBitmap);
+            }
+        });
+    }
+
+    void getGeoLocation() {
+        location.setText("Fetching location...");
+        new AsyncTask<Void, Void, Void>() {
+            float[] latLong = new float[2];
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    ExifInterface exifInterface = new ExifInterface(photoLocationPath);
+                    //latitude = exifInterface.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+                    exifInterface.getLatLong(latLong);
+                    latitude = String.valueOf(latLong[0]);
+                    longitude = String.valueOf(latLong[1]);
+                } catch (IOException e) {
+                    Toast.makeText(UploadPicture.this, "Unable to get image geo tag, location with be set to current", Toast.LENGTH_LONG).show();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                location.setText(latitude +", "+ longitude);
+            }
+        }.execute();
     }
 
     @Override
@@ -198,7 +326,3 @@ public class  UploadPicture extends AppCompatActivity {
         return finalPath;
     }
 }
-
-
-
-
