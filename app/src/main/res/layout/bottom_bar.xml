@@ -30,6 +30,7 @@
             android:textSize="16dp" />
 
         <EditText
+            android:focusable="false"
             android:layout_width="fill_parent"
             android:layout_height="60dp"
             android:id="@+id/captionField"
