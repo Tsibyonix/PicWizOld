@@ -1,16 +1,14 @@
 package com.core.project.picwiz;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,18 +23,22 @@ import android.widget.SeekBar;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.core.project.picwiz.Filters.GrayFilter;
 
 import com.core.project.picwiz.Filters.OldFilter;
 import com.github.clans.fab.FloatingActionButton;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.NetworkInterface;
-import java.net.URL;
+import java.io.InputStream;
 
 public class  UploadPicture extends AppCompatActivity {
     String photoLocation;
@@ -324,5 +326,85 @@ public class  UploadPicture extends AppCompatActivity {
                 finalPath = finalPath.concat("/");
         }
         return finalPath;
+    }
+
+    private class UploadTask extends AsyncTask<Bitmap, Void, Void> {
+
+        protected Void doInBackground(Bitmap... params) {
+            if (params == null)
+                return null;
+            setProgress(0); //initial progress of the progress bar
+
+            //storing the bitmap in a variable
+            ByteArrayOutputStream stream = new ByteArrayOutputStream(); //creating an object of byteArrayoutput stream
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream); // convert Bitmap to ByteArrayOutputStream
+            InputStream in = new ByteArrayInputStream(stream.toByteArray()); // convert ByteArrayOutputStream to ByteArrayInputStream
+            Log.d("image", "cant get the image ");
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+            try {
+                HttpPost httppost = new HttpPost(
+                        "http://e-learningpoint.in/picwiz/uploadimage.php"); // server
+
+                MultipartEntity reqEntity = new MultipartEntity();
+                reqEntity.addPart("PicWiz",
+                        System.currentTimeMillis() + ".jpg", in);
+                httppost.setEntity(reqEntity);
+
+                Log.i(TAG, "request " + httppost.getRequestLine());
+                HttpResponse response = null;
+                try {
+                    response = httpclient.execute(httppost);
+                } catch (ClientProtocolException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                try {
+                    if (response != null)
+                        Log.i(TAG, "response " + response.getStatusLine().toString());
+                } finally {
+
+                }
+            } finally {
+
+            }
+
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            // TODO Auto-generated method stub
+            super.onProgressUpdate(values);
+        }
+
+
+
+        @Override
+        protected void onPostExecute(Void result) {
+            // TODO Auto-generated method stub
+            super.onPostExecute(result);
+            Toast.makeText(UploadPicture.this, "uploaded", Toast.LENGTH_LONG).show();
+        }
     }
 }
