@@ -12,7 +12,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:id="@+id/scrollView">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/crop_fit"
                 android:background="#2b2b2b"
-                android:text="ROTATE"
+                android:text="@string/rotate"
                 android:textColor="#446CB3"
                 app:layout_collapseMode="parallax" />
 
@@ -43,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/rotate"
                 android:background="#2b2b2b"
-                android:text="BRIGHTNESS"
+                android:text="@string/brightness"
                 android:textColor="#446CB3"
                 app:layout_collapseMode="parallax" />
 
@@ -57,6 +58,48 @@
                 android:max="80"
                 android:visibility="gone"
                 android:layout_alignBottom="@+id/brightness" />
+
+            <Button
+                android:id="@+id/greyscale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/brightness"
+                android:background="#2b2b2b"
+                android:text="@string/greyscale"
+                android:textColor="#446CB3"
+                app:layout_collapseMode="parallax" />
+
+            <Button
+                android:id="@+id/old"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/greyscale"
+                android:background="#2b2b2b"
+                android:text="@string/old"
+                android:textColor="#446CB3"
+                app:layout_collapseMode="parallax" />
+
+            <Button
+                android:id="@+id/blur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/old"
+                android:background="#2b2b2b"
+                android:text="@string/blur"
+                android:textColor="#446CB3"
+                app:layout_collapseMode="parallax" />
+
+            <SeekBar
+                android:id="@+id/setBlur"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:max="12"
+                android:visibility="gone"
+                android:indeterminate="false"
+                android:layout_alignTop="@+id/blur"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/blur"
+                android:layout_alignBottom="@+id/blur" />
 
         </RelativeLayout>
 

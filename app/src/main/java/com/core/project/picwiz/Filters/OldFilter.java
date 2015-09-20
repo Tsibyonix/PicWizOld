@@ -32,9 +32,7 @@ public class OldFilter {
                 int newColor = Color.argb(255, newR > 255 ? 255 : newR, newG > 255 ? 255 : newG, newB > 255 ? 255 : newB);  
                 pixels[width * i + k] = newColor;  
             }  
-        }  
-          
-        Bitmap returnBitmap = Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
-        return returnBitmap;
+        }
+        return Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888);
 	}
 }

@@ -1,5 +1,11 @@
 package com.core.project.picwiz;
 
+<<<<<<< HEAD
+=======
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+>>>>>>> origin/master
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
@@ -7,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,10 +26,16 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
+<<<<<<< HEAD
+=======
+
+import com.core.project.picwiz.Filters.GrayFilter;
+>>>>>>> origin/master
 
 import com.core.project.picwiz.Filters.OldFilter;
 import com.github.clans.fab.FloatingActionButton;
@@ -38,14 +51,21 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+<<<<<<< HEAD
 import java.io.InputStream;
+=======
+import java.net.HttpURLConnection;
+import java.net.NetworkInterface;
+import java.net.URL;
+import java.util.ArrayList;
+>>>>>>> origin/master
 
 public class  UploadPicture extends AppCompatActivity {
     String photoLocation;
     Uri photoLocationURI;
     String photoLocationPath;
     private static String TAG = "log";
-    private Bitmap changeBitmap = null;
+    public static final String SETTINGS_NAME = "MySettingsFile";
 
     float imageViewX, imageViewY;
 
@@ -53,6 +73,7 @@ public class  UploadPicture extends AppCompatActivity {
     FloatingActionButton upload;
     Bitmap outBitmap;
     Bitmap originalBitmap;
+    ArrayList<Bitmap> bitmapArrayList = new ArrayList<>();
 
     int CurrentSavedPicNumber;
 
@@ -65,10 +86,14 @@ public class  UploadPicture extends AppCompatActivity {
     Button crop_scale;
     Button brightness;
         SeekBar setBrightness;
+    Button greyscale;
+    Button old;
+
 
     //bar
     android.support.v7.widget.Toolbar midBar;
     android.support.v7.widget.Toolbar bottomBar;
+    ScrollView scrollView;
     CheckBox uploadCheck;
     EditText caption;
     TextView location;
@@ -83,23 +108,35 @@ public class  UploadPicture extends AppCompatActivity {
         setContentView(R.layout.activity_upload_picture);
         imageView = (TouchImageView) findViewById(R.id.customImageView);
         upload = (FloatingActionButton) findViewById(R.id.upload);
-        uploadCheck = (CheckBox) findViewById(R.id.uploadCheck);
-        caption = (EditText) findViewById(R.id.captionField);
-        location = (TextView) findViewById(R.id.location);
         spaceTop = (Space) findViewById(R.id.space_top);
         space_bottom = (Space) findViewById(R.id.space_bottom);
         //bar
         midBar = (android.support.v7.widget.Toolbar) findViewById(R.id.midBar);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
         bottomBar = (android.support.v7.widget.Toolbar) findViewById(R.id.bottomBar);
+        uploadCheck = (CheckBox) findViewById(R.id.uploadCheck);
+        caption = (EditText) findViewById(R.id.captionField);
+        location = (TextView) findViewById(R.id.location);
 
         //img
         crop_scale = (Button) findViewById(R.id.crop_fit);
         rotation = (Button) findViewById(R.id.rotate);
         brightness = (Button) findViewById(R.id.brightness);
             setBrightness = (SeekBar) findViewById(R.id.setBrightness);
+        greyscale = (Button) findViewById(R.id.greyscale);
+        old = (Button) findViewById(R.id.old);
 
         //upload.setVisibility(View.GONE);
         //upload.setAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+
+        SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, Activity.MODE_PRIVATE);
+        CurrentSavedPicNumber = settings.getInt("CurrentSavedPicNumber", 0);
+
+        if(savedInstanceState != null) {
+            savedInstanceState.getParcelableArrayList("editState");
+            imageView.setImageBitmap(bitmapArrayList.get(bitmapArrayList.size() - 1));
+            imageView.setZoom(savedInstanceState.getFloat("zoomState"));
+        }
 
         if(savedInstanceState == null) {
             Log.i(TAG, "Not a saved instance");
@@ -124,6 +161,10 @@ public class  UploadPicture extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        if(bitmapArrayList.isEmpty()) {
+            bitmapArrayList.add(originalBitmap);
+        }
+
         final ViewTreeObserver imageViewObserver = imageView.getViewTreeObserver();
         imageViewObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -131,7 +172,6 @@ public class  UploadPicture extends AppCompatActivity {
                 imageViewY = (float) imageView.getMeasuredHeight();
                 imageViewX = (float) imageView.getMeasuredWidth();
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                //imageView.setImageURI(photoLocationURI);
                 imageView.setImageBitmap(originalBitmap);
                 getGeoLocation();
             }
@@ -156,11 +196,16 @@ public class  UploadPicture extends AppCompatActivity {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_MOVE:
                         //Toast.makeText(UploadPicture.this, "drag", Toast.LENGTH_SHORT).show();
-
+                        float zoom;
+                        zoom = imageView.getCurrentZoom();
                         if (!uploadCheck.isChecked()) {
                             uploadCheck.setChecked(false);
+                            imageView.setImageBitmap(bitmapArrayList.get(bitmapArrayList.size() - 1));
+                            imageView.setZoom(zoom);
                         } else {
                             uploadCheck.setChecked(true);
+                            imageView.setImageBitmap(bitmapArrayList.get(bitmapArrayList.size() - 1));
+                            imageView.setZoom(zoom);
                         }
                         break;
                 }
@@ -171,11 +216,11 @@ public class  UploadPicture extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(uploadCheck.isChecked()) {
+                if (uploadCheck.isChecked()) {
                     BitmapDrawable btmpDr = (BitmapDrawable) imageView.getDrawable();
                     outBitmap = btmpDr.getBitmap();
 
-                    final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/PicWiz/";
+                    final String dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/PicWiz/Saves/";
                     File newDir = new File(dir);
                     if (newDir.isDirectory()) {
 
@@ -188,9 +233,15 @@ public class  UploadPicture extends AppCompatActivity {
                     File newPic;
                     FileOutputStream fileOutputStream = null;
 
-                    CurrentSavedPicNumber = +200;
+                    CurrentSavedPicNumber = CurrentSavedPicNumber + 1;
                     file = dir + CurrentSavedPicNumber + ".jpg";
                     newPic = new File(file);
+
+                    while (newPic.exists()) {
+                        CurrentSavedPicNumber = CurrentSavedPicNumber + 1;
+                        file = dir+CurrentSavedPicNumber+".jpg";
+                        newPic = new File(file);
+                    }
 
                     outputImageUri = Uri.fromFile(newPic);
                     try {
@@ -200,10 +251,11 @@ public class  UploadPicture extends AppCompatActivity {
                     }
 
                     outBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                    Toast.makeText(UploadPicture.this, "Image Saved", Toast.LENGTH_SHORT).show();
+                    finish();
                 } else {
 
                 }
-
             }
         });
 
@@ -238,10 +290,20 @@ public class  UploadPicture extends AppCompatActivity {
         rotation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                //imageView.setImageBitmap(tempBitmap);
+            }
+        });
+
+        greyscale.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final float zoom;
+                zoom = imageView.getCurrentZoom();
+                BitmapDrawable btmpDr = (BitmapDrawable) imageView.getDrawable();
                 Bitmap tempBitmap = null;
-                imageView.buildDrawingCache();
-                tempBitmap = imageView.getDrawingCache();
-                imageView.setImageBitmap(null);
+                tempBitmap = btmpDr.getBitmap();
+
                 final Bitmap finalTempBitmap = Bitmap.createBitmap(tempBitmap);
 
                 new AsyncTask<Void, Bitmap, Void>() {
@@ -251,17 +313,48 @@ public class  UploadPicture extends AppCompatActivity {
                     @Override
                     protected Void doInBackground(Void... params) {
                         Log.i("Filter", "Running");
-                        processedBitmap = OldFilter.changeToOld(finalTempBitmap);
+                        processedBitmap = GrayFilter.changeToGray(finalTempBitmap);
                         return null;
                     }
 
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         Log.i("Filter", "Done");
+                        bitmapArrayList.add(processedBitmap);
                         imageView.setImageBitmap(processedBitmap);
+                        imageView.setZoom(zoom);
                     }
                 }.execute();
-                //imageView.setImageBitmap(tempBitmap);
+            }
+        });
+
+        old.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final float zoom;
+                zoom = imageView.getCurrentZoom();
+                BitmapDrawable btmpDr = (BitmapDrawable) imageView.getDrawable();
+                final Bitmap tempBitmap = btmpDr.getBitmap();
+
+                new AsyncTask<Void, Bitmap, Void>() {
+
+                    Bitmap processedBitmap;
+
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        Log.i("Filter", "Running");
+                        processedBitmap = OldFilter.changeToOld(tempBitmap);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        Log.i("Filter", "Done");
+                        bitmapArrayList.add(processedBitmap);
+                        imageView.setImageBitmap(processedBitmap);
+                        imageView.setZoom(zoom);
+                    }
+                }.execute();
             }
         });
     }
@@ -299,6 +392,23 @@ public class  UploadPicture extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("CurrentSavedPicNumber", CurrentSavedPicNumber);
+        editor.commit();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        outState.putParcelableArrayList("editState", bitmapArrayList);
+        outState.putFloat("zoomState", imageView.getCurrentZoom());
+
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
