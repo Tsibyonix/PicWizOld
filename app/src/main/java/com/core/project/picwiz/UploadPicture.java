@@ -1,11 +1,7 @@
 package com.core.project.picwiz;
 
-<<<<<<< HEAD
-=======
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
->>>>>>> origin/master
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
@@ -31,12 +27,8 @@ import android.widget.SeekBar;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
-<<<<<<< HEAD
-=======
 
 import com.core.project.picwiz.Filters.GrayFilter;
->>>>>>> origin/master
-
 import com.core.project.picwiz.Filters.OldFilter;
 import com.github.clans.fab.FloatingActionButton;
 
@@ -51,14 +43,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-<<<<<<< HEAD
 import java.io.InputStream;
-=======
-import java.net.HttpURLConnection;
-import java.net.NetworkInterface;
-import java.net.URL;
 import java.util.ArrayList;
->>>>>>> origin/master
+
 
 public class  UploadPicture extends AppCompatActivity {
     String photoLocation;
@@ -88,7 +75,7 @@ public class  UploadPicture extends AppCompatActivity {
         SeekBar setBrightness;
     Button greyscale;
     Button old;
-
+    FloatingActionButton UPLOAD;
 
     //bar
     android.support.v7.widget.Toolbar midBar;
@@ -117,7 +104,6 @@ public class  UploadPicture extends AppCompatActivity {
         uploadCheck = (CheckBox) findViewById(R.id.uploadCheck);
         caption = (EditText) findViewById(R.id.captionField);
         location = (TextView) findViewById(R.id.location);
-
         //img
         crop_scale = (Button) findViewById(R.id.crop_fit);
         rotation = (Button) findViewById(R.id.rotate);
@@ -256,6 +242,7 @@ public class  UploadPicture extends AppCompatActivity {
                 } else {
 
                 }
+                new UploadTask().execute(outBitmap);
             }
         });
 
@@ -447,13 +434,13 @@ public class  UploadPicture extends AppCompatActivity {
 
             //storing the bitmap in a variable
             ByteArrayOutputStream stream = new ByteArrayOutputStream(); //creating an object of byteArrayoutput stream
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream); // convert Bitmap to ByteArrayOutputStream
+            outBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream); // convert Bitmap to ByteArrayOutputStream
             InputStream in = new ByteArrayInputStream(stream.toByteArray()); // convert ByteArrayOutputStream to ByteArrayInputStream
             Log.d("image", "cant get the image ");
             DefaultHttpClient httpclient = new DefaultHttpClient();
             try {
                 HttpPost httppost = new HttpPost(
-                        "http://e-learningpoint.in/picwiz/uploadimage.php"); // server
+                        "http://picwiz.e-learningpoint.in/uploadimage.php"); // server
 
                 MultipartEntity reqEntity = new MultipartEntity();
                 reqEntity.addPart("PicWiz",
