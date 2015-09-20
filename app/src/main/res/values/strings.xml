@@ -13,6 +13,10 @@
 
     //app_bar buttons
     <string name="scale">SCALE</string>
+    <string name="rotate">ROTATE</string>
+    <string name="brightness">BRIGHTNESS</string>
+    <string name="greyscale">GREYSCALE</string>
+    <string name="old">OLD</string>
 
     //settings screen
     <string name="username"><b>Username</b></string>
@@ -26,4 +30,5 @@
     <string name="title_activity_about">About</string>
     <string name="title_activity_upload_picture">UploadPicture</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="blur">BLUR</string>
 </resources>
