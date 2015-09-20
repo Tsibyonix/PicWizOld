@@ -26,11 +26,9 @@ public class MainRecyclerViewAdaper extends RecyclerView.Adapter<MainRecyclerVie
     }
     @Override
     public MainRecyclerViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        //View root = mainRecyclerViewInflater.inflate(R.layout.main_recycler_view_layout, parent, false);
-        //READ THIS: ^ here its not accepting the work parent i don't know what else to put;
-        //MainRecyclerViewHolder mainRecyclerViewHolder = new MainRecyclerViewHolder(root);
-        //return mainRecyclerViewHolder;
-        return null;
+        View root = mainRecyclerViewInflater.inflate(R.layout.main_recycler_view_layout, viewGroup, false);
+        MainRecyclerViewHolder mainRecyclerViewHolder = new MainRecyclerViewHolder(root);
+        return mainRecyclerViewHolder;
     }
 
     @Override
