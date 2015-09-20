@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.opengl.Matrix;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.PersistableBundle;
@@ -69,7 +73,7 @@ public class  UploadPicture extends AppCompatActivity {
     Button rotation;
     Button crop_scale;
     Button brightness;
-        SeekBar setBrightness;
+    SeekBar setBrightness;
     Button greyscale;
     Button old;
 
@@ -106,7 +110,7 @@ public class  UploadPicture extends AppCompatActivity {
         crop_scale = (Button) findViewById(R.id.crop_fit);
         rotation = (Button) findViewById(R.id.rotate);
         brightness = (Button) findViewById(R.id.brightness);
-            setBrightness = (SeekBar) findViewById(R.id.setBrightness);
+        setBrightness = (SeekBar) findViewById(R.id.setBrightness);
         greyscale = (Button) findViewById(R.id.greyscale);
         old = (Button) findViewById(R.id.old);
 
@@ -116,16 +120,16 @@ public class  UploadPicture extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(SETTINGS_NAME, Activity.MODE_PRIVATE);
         CurrentSavedPicNumber = settings.getInt("CurrentSavedPicNumber", 0);
 
-        if(savedInstanceState != null) {
+        if (savedInstanceState != null) {
             savedInstanceState.getParcelableArrayList("editState");
             imageView.setImageBitmap(bitmapArrayList.get(bitmapArrayList.size() - 1));
             imageView.setZoom(savedInstanceState.getFloat("zoomState"));
         }
 
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             Log.i(TAG, "Not a saved instance");
             Bundle extra = getIntent().getExtras();
-            if(extra == null) {
+            if (extra == null) {
                 Log.i(TAG, "Extra is null");
                 photoLocation = null;
             } else {
@@ -140,12 +144,12 @@ public class  UploadPicture extends AppCompatActivity {
         photoLocationPath = getRealPathFromURI(photoLocationURI);
 
         try {
-            originalBitmap = MediaStore.Images.Media.getBitmap(UploadPicture.this.getContentResolver(),photoLocationURI);
+            originalBitmap = MediaStore.Images.Media.getBitmap(UploadPicture.this.getContentResolver(), photoLocationURI);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        if(bitmapArrayList.isEmpty()) {
+        if (bitmapArrayList.isEmpty()) {
             bitmapArrayList.add(originalBitmap);
         }
 
@@ -223,7 +227,7 @@ public class  UploadPicture extends AppCompatActivity {
 
                     while (newPic.exists()) {
                         CurrentSavedPicNumber = CurrentSavedPicNumber + 1;
-                        file = dir+CurrentSavedPicNumber+".jpg";
+                        file = dir + CurrentSavedPicNumber + ".jpg";
                         newPic = new File(file);
                     }
 
@@ -246,7 +250,7 @@ public class  UploadPicture extends AppCompatActivity {
         uploadCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!uploadCheck.isChecked()) {
+                if (!uploadCheck.isChecked()) {
                     caption.setVisibility(View.VISIBLE);
                     location.setVisibility(View.VISIBLE);
                     spaceTop.setVisibility(View.VISIBLE);
@@ -263,7 +267,7 @@ public class  UploadPicture extends AppCompatActivity {
         brightness.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(setBrightness.getVisibility() == View.VISIBLE) {
+                if (setBrightness.getVisibility() == View.VISIBLE) {
                     setBrightness.setVisibility(View.GONE);
                 } else {
                     setBrightness.setVisibility(View.VISIBLE);
@@ -347,6 +351,7 @@ public class  UploadPicture extends AppCompatActivity {
         location.setText("Fetching location...");
         new AsyncTask<Void, Void, Void>() {
             float[] latLong = new float[2];
+
             @Override
             protected Void doInBackground(Void... params) {
                 try {
@@ -363,7 +368,7 @@ public class  UploadPicture extends AppCompatActivity {
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                location.setText(latitude +", "+ longitude);
+                location.setText(latitude + ", " + longitude);
             }
         }.execute();
     }
@@ -414,11 +419,30 @@ public class  UploadPicture extends AppCompatActivity {
         split = contentUri.toString().split("/");
         String finalPath;
         finalPath = "/";
-        for(int i = 3; i <= split.length - 1; i++) {
+        for (int i = 3; i <= split.length - 1; i++) {
             finalPath = finalPath.concat(split[i]);
-            if(i != split.length - 1)
+            if (i != split.length - 1)
                 finalPath = finalPath.concat("/");
         }
         return finalPath;
+    }
+
+    public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int heightRatio = Math.round((float) height / (float) reqHeight);
+            final int widthRatio = Math.round((float) width / (float) reqWidth);
+            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        }
+        final float totalPixels = width * height;
+        final float totalReqPixelsCap = reqWidth * reqHeight * 2;
+        while (totalPixels / (inSampleSize * inSampleSize) > totalReqPixelsCap) {
+            inSampleSize++;
+        }
+
+        return inSampleSize;
     }
 }
