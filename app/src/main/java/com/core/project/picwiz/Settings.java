@@ -45,20 +45,15 @@ public class Settings extends AppCompatActivity {
         email = settings.getString("email", null);
         emailField.setText(email);
 
-        RadioButton darkRadioButton = (RadioButton) findViewById(R.id.darkRadioButton);
-        RadioButton lightRadioButton = (RadioButton) findViewById(R.id.lightRadioButton);
-
-        RadioGroup themeSelection = (RadioGroup) findViewById(R.id.themeRadioGroup);
-
         check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(usernameField.getText().toString().isEmpty()) {
+                if (usernameField.getText().toString().isEmpty()) {
                     Toast.makeText(Settings.this, "Cannot change username to empty", Toast.LENGTH_SHORT).show();
                 } else {
                     editor.putString("username", usernameField.getText().toString());
                     editor.commit();
-                    Toast.makeText(Settings.this, "Username changed to "+usernameField.getText().toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Settings.this, "Username changed to " + usernameField.getText().toString(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -66,47 +61,15 @@ public class Settings extends AppCompatActivity {
         checkEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(emailField.getText().toString().isEmpty()) {
+                if (emailField.getText().toString().isEmpty()) {
                     Toast.makeText(Settings.this, "Cannot change email to empty", Toast.LENGTH_SHORT).show();
                 } else {
                     editor.putString("email", emailField.getText().toString());
                     editor.commit();
-                    Toast.makeText(Settings.this, "Email changed to "+emailField.getText().toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Settings.this, "Email changed to " + emailField.getText().toString(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-        themeSelection.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.darkRadioButton:
-                        break;
-                    case R.id.lightRadioButton:
-                        break;
-                }
-            }
-        });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int selectionId = item.getItemId();
-
-        switch (selectionId)
-        {
-            case R.id.action_back:
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public String getCurrentTheme(){

@@ -26,6 +26,7 @@ import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,6 +58,7 @@ public class HomeScreen extends AppCompatActivity {
     Intent galleryUploadPhotoIntent;
 
     FloatingActionMenu floatingActionMenu;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,7 @@ public class HomeScreen extends AppCompatActivity {
         Log.i(TAG, String.valueOf(currentPicNumber));
 
         FrameLayout homeScreen = (FrameLayout) findViewById(R.id.home_Screen_Layout);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
         //Floating Menu; API: https://github.com/Clans/FloatingActionButton
         floatingActionMenu = (FloatingActionMenu) findViewById(R.id.floatingActionMenu);
@@ -200,8 +203,6 @@ public class HomeScreen extends AppCompatActivity {
         {
             case R.id.action_Settings:
                 startActivity(new Intent(this, Settings.class));
-                break;
-            case R.id.action_MyProfile:
                 break;
             case R.id.action_About:
                 startActivity(new Intent(this, About.class));

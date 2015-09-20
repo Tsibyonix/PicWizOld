@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Theme.AppCompat.Light.DarkActionBar"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:background="#2b2b2b"
+    android:paddingRight="16dp"
+    android:theme="@style/Platform.AppCompat"
+    app:expandedTitleMarginEnd="64dp"
+    app:expandedTitleMarginStart="48dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/username" />
+
+        <EditText
+            android:id="@+id/usernameField"
+            android:layout_width="235dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:drawableLeft="@drawable/ic_user_left"
+            android:layout_below="@+id/userName"
+            android:layout_toStartOf="@+id/check"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name"
+            android:textSize="16dp" />
+
+        <Button
+            android:id="@+id/check"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="49dp"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/usernameField"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/usernameField"
+            android:layout_gravity="right"
+            android:text=">" />
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/usernameField"
+            android:text="@string/email" />
+
+        <EditText
+            android:id="@+id/emailField"
+            android:layout_width="235dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/checkEmail"
+            android:drawableLeft="@drawable/ic_email_left"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Email"
+            android:textSize="16dp"
+            android:layout_below="@+id/email" />
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:id="@+id/checkEmail"
+            android:layout_width="49dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text=">"
+            android:layout_alignTop="@+id/emailField"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.Toolbar>
