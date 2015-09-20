@@ -1,4 +1,5 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -22,8 +23,6 @@
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="8dp"
         android:layout_marginRight="8dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
         fab:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
         fab:menu_labels_hideAnimation="@anim/fab_slide_out_to_right"
         fab:fab_colorNormal="@color/floating_primary_pressed"
@@ -33,20 +32,25 @@
         fab:menu_animationDelayPerItem="50"
         fab:menu_shadowColor="#444">
 
-
         <com.github.clans.fab.FloatingActionButton
+            fab:fab_colorNormal="@color/floating_primary_pressed"
+            fab:fab_colorPressed="@color/floating_primary_pressed"
+            fab:menu_colorRipple="@color/floating_ripple"
             android:id="@+id/floatingActionButton_Gallery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/ic_gallery"
             fab:fab_label="Gallery"
             style="@style/MenuButtonsStyle" />
 
         <com.github.clans.fab.FloatingActionButton
+            fab:fab_colorNormal="@color/floating_primary_pressed"
+            fab:fab_colorPressed="@color/floating_primary_pressed"
+            fab:menu_colorRipple="@color/floating_ripple"
             android:id="@+id/floatingActionButton_Camera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher"
+            android:src="@drawable/ic_camera"
             fab:fab_label="Camera"
             style="@style/MenuButtonsStyle" />
 
